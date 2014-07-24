@@ -20,8 +20,12 @@
       var retsly = new Retsly('LhBv616CKzcUtdplacAX', '7555d79c2814eee8adce819da5f79ed7', { debug: true});
 
       function initialize(listings) {
-        var map = new google.maps.Map(document.getElementById("map-canvas"));
-        boundMap(listings, map);
+        var mapOptions = {
+          zoom: 14,
+          center: new google.maps.LatLng(37.774986, -122.419769)
+        };
+
+        var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
         placeMarkers(listings, map);
       }
 
@@ -33,36 +37,13 @@
           var coordinates = listing.coordinates;
           var myLatlng = new google.maps.LatLng(coordinates.latitude, coordinates.longitude);
           var marker = new google.maps.Marker({position: myLatlng});
-          setInfoWindowContent(listing, marker, map, infowindow);
           marker.setMap(map);
         });
       }
 
-      function setInfoWindowContent(listing, marker, map, infowindow){
-        var contentString = ' <div id="content">' + listing.address +
-          '</div> <IMG width="250" SRC="'+ listing.photos[0].location +'">';
-
-        google.maps.event.addListener(marker, 'click', function() {
-          infowindow.setContent(contentString);
-          console.log(infowindow.getContent());
-          infowindow.open(map,marker);
-        });
-      }
-
-      function boundMap(listings, map){
-        var LatLngList = [];
-        var bounds = new google.maps.LatLngBounds ();
-        for (var i = 0; i < listings.length; i++) {
-          var LatLng = new google.maps.LatLng(listings[i].coordinates.latitude, listings[i].coordinates.longitude);
-          bounds.extend (LatLng);
-        }
-        console.log("bounds", bounds);
-        map.fitBounds (bounds);
-      }
-
       retsly.ready(function() {
         retsly.get('/api/v1/listing/test.json', {}, function(res) {
-          console.log(res.bundle);
+          console.log(res.bundle[0]);
           google.maps.event.addDomListener(window, 'load', initialize(res.bundle));
         });
       });
