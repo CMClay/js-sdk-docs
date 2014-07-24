@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 100% }
+    </style>
+
+
+
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAm47ro9KeqdxFm52hUbZEICdLk9sg9r2Q">
+    </script>
+
+    <script src='retsly-sdk.js'></script>
+    <!-- // <script src='https://dev.rets.ly/js/sdk'></script> -->
+
+    <script type="text/javascript">
+      var Retsly = require('retsly-sdk');
+      var retsly = new Retsly('LhBv616CKzcUtdplacAX', '7555d79c2814eee8adce819da5f79ed7', { debug: true});
+
+      function initialize(lat, lng, properties) {
+        var map = new google.maps.Map(document.getElementById("map-canvas"));
+        boundMap(properties, map);
+        placeMarkers(properties, map);
+      }
+
+      function placeMarkers(properties, map){
+        var infowindow = new google.maps.InfoWindow();
+        infowindow.setContent('<IMG style="width 250px; height: 250px">');
+
+        properties.forEach(function(property){
+          var coordinates = property.coordinates;
+          var myLatlng = new google.maps.LatLng(coordinates.latitude, coordinates.longitude);
+          var marker = new google.maps.Marker({position: myLatlng});
+          setInfoWindowContent(property, marker, map, infowindow);
+          marker.setMap(map);
+        });
+      }
+
+      function setInfoWindowContent(property, marker, map, infowindow){
+        var contentString = ' <div id="content">' + property.address + '</div> <IMG style="width: 250px" SRC="'+ property.photos[0].location +'">';
+
+        google.maps.event.addListener(marker, 'click', function() {
+          infowindow.setContent(contentString);
+          console.log(infowindow.getContent());
+          infowindow.open(map,marker);
+        });
+      }
+
+      function boundMap(properties, map){
+        var LatLngList = [];
+        var bounds = new google.maps.LatLngBounds ();
+        for (var i = 0; i < properties.length; i++) {
+          var LatLng = new google.maps.LatLng(properties[i].coordinates.latitude, properties[i].coordinates.longitude);
+          bounds.extend (LatLng);
+        }
+        console.log(bounds);
+        map.fitBounds (bounds);
+      }
+
+      retsly.ready(function() {
+        retsly.get('/api/v1/listing/test.json', {}, function(res) {
+          console.log(res.bundle[0]);
+          var lat = res.bundle[0].coordinates.latitude
+          var lng = res.bundle[0].coordinates.longitude
+
+        // google.maps.event.addDomListener(window, 'load', initialize);
+
+          initialize(lat, lng, res.bundle);
+        });
+      });
+    </script>
+
+  </head>
+  <body>
+    <div id="map-canvas"/>
+  </body>
+</html>

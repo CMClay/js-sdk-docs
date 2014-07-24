@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>
+    retsly api example
+  </title>
+</head>
+<body>
+<h1>API test</h1>
+  
+  
+  <script src='hackApi.js'></script>
+
+  <script type="text/javascript">
+    var Retsly = require('retsly-sdk');
+    // var retsly = new Retsly('LhBv616CKzcUtdplacAX', '7555d79c2814eee8adce819da5f79ed7', { debug: true, urlBase: "https://dev.rets.io"});
+    var retsly = new Retsly('LhBv616CKzcUtdplacAX', '7555d79c2814eee8adce819da5f79ed7', { debug: true});
+    console.log(retsly);
+
+    retsly.ready(function() {
+      retsly.get('/api/v1/listing/test.json', {}, function(res) {
+      // { success: true, status_code: 200, bundle: [{ ... }, { ... }] }
+        console.log(res.bundle[0]);
+      });
+    });
+  </script>
+</body>
+</html>
